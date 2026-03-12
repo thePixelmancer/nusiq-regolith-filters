@@ -1,0 +1,41 @@
+{
+  "$schema": "https://raw.githubusercontent.com/Bedrock-OSS/regolith-schemas/main/config/v1.4.json",
+  "author": "test",
+  "name": "test",
+  "packs": {
+    "behaviorPack": "./packs/BP",
+    "resourcePack": "./packs/RP"
+  },
+  "regolith": {
+    "dataPath": "./data",
+    "filterDefinitions": {
+      "pack_anything": {
+        "runWith": "python",
+        "script": "../main.py"
+      }
+    },
+    "formatVersion": "1.4.0",
+    "profiles": {
+      "default": {
+        "export": {
+          "build": "standard",
+          "readOnly": false,
+          "target": "local"
+        },
+        "filters": [
+          {
+            "filter": "pack_anything",
+            "settings": {
+              "output": "`f'tag-{git_describe}.mcaddon'`",
+              "pathmap": {
+                "RP": "rp",
+                "BP": "bp",
+                "PROJECT:worlds/release-world": "."
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

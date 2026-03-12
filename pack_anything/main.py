@@ -22,13 +22,43 @@ def get_git_tag():
         return git_out
     except:
         return 'unknown'
+    
+def parse_args(raw_args: list[str]) -> dict:
+    result = {}
+    args = iter(raw_args)
+    for arg in args:
+        if not arg.startswith('--'):
+            continue
+        key = arg[2:].strip()
+        if not key:
+            continue
+        try:
+            value = next(args)
+            if value.startswith('--'):
+                raise StopIteration
+        except StopIteration:
+            value = True
+        if key in result:
+            print(f"Warning: duplicate arg '{key}', using last value '{value}'", file=sys.stderr)
+        result[key] = value
+    return result
 
 def main():
     config = json.loads(sys.argv[1])
+    args = parse_args(sys.argv[2:])
+    
     output_str = config['output']
     if output_str.startswith('`') and output_str.endswith('`'):
         output_str = output_str[1:-1]
-        output_str = eval(output_str, {'git_describe': get_git_tag()})
+        try:
+            output_str = eval(output_str, {
+                'git_describe': get_git_tag(),
+                'args': args
+            })
+        except KeyError as e:
+            key = str(e).strip("'")
+            print(f"Error: output template uses 'args[\"{key}\"]' but '--{key}' was not provided", file=sys.stderr)
+            sys.exit(1)
 
     output: Path = Path(PROJECT_PATH) / output_str
     output.parent.mkdir(parents=True, exist_ok=True)

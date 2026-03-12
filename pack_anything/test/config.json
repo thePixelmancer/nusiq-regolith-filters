@@ -26,13 +26,14 @@
           {
             "filter": "pack_anything",
             "settings": {
-              "output": "`f'tag-{git_describe}.mcaddon'`",
+              "output": "`'test.' + args.get('version') + '.mcaddon' if args.get('version') else 'test.mcaddon'`",
               "pathmap": {
                 "RP": "rp",
                 "BP": "bp",
                 "PROJECT:worlds/release-world": "."
               }
-            }
+            },
+            "extraArguments": "append"
           }
         ]
       }
